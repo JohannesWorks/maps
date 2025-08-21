@@ -34,6 +34,9 @@
 				@click="$emit('add-to-map-favorite', favorite)">
 				{{ t('maps', 'Copy to map') }}
 			</NcActionButton>
+			<NcActionButton icon="icon-external" @click="openInGoogleMaps">
+				{{ t('maps', 'Navigate in Google Maps') }}
+			</NcActionButton>
 		</LPopup>
 	</LMarker>
 </template>
@@ -44,6 +47,7 @@ import NcActionButton from '@nextcloud/vue/dist/Components/NcActionButton.js'
 import L from 'leaflet'
 import { LMarker, LTooltip, LPopup } from 'vue2-leaflet'
 import { isPublic } from '../../utils/common'
+import { getGoogleMapsUrl } from '../../utils/favoritesUtils.js'
 
 export default {
 	name: 'FavoriteMarker',
@@ -120,6 +124,10 @@ export default {
 		},
 		isPublic() {
 			return isPublic()
+		},
+		openInGoogleMaps() {
+			const googleMapsUrl = getGoogleMapsUrl(this.favorite.lat, this.favorite.lng, this.favorite.name)
+			window.open(googleMapsUrl, '_blank')
 		},
 	},
 }

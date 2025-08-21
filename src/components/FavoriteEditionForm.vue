@@ -65,6 +65,15 @@
 					{{ t('maps', 'Delete') }}
 				</template>
 			</NcButton>
+			<NcButton
+				@click="openInGoogleMaps">
+				<template #icon>
+					<span class="icon icon-external" />
+				</template>
+				<template>
+					{{ t('maps', 'Navigate in Google Maps') }}
+				</template>
+			</NcButton>
 		</div>
 	</div>
 </template>
@@ -72,6 +81,7 @@
 <script>
 import NcSelect from '@nextcloud/vue/dist/Components/NcSelect.js'
 import NcButton from '@nextcloud/vue/dist/Components/NcButton.js'
+import { getGoogleMapsUrl } from '../utils/favoritesUtils.js'
 
 export default {
 	name: 'FavoriteEditionForm',
@@ -187,6 +197,10 @@ export default {
 		},
 		onDeleteClick() {
 			this.$emit('delete', this.favorite.id)
+		},
+		openInGoogleMaps() {
+			const googleMapsUrl = getGoogleMapsUrl(this.lat, this.lng, this.name)
+			window.open(googleMapsUrl, '_blank')
 		},
 	},
 }
