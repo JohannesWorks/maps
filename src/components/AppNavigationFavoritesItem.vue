@@ -57,9 +57,11 @@
 				:editable="enabled && c.enabled && c.isUpdateable"
 				:edit-placeholder="t('maps', 'Category name')"
 				:edit-label="t('maps', 'Rename')"
-				:allow-collapse="false"
+				:allow-collapse="true"
+				:open="categoryOpen[catid]"
 				:force-menu="false"
 				@click="onCategoryClick(catid)"
+				@update:open="onCategoryUpdateOpen(catid, $event)"
 				@update:name="$emit('rename-category', { old: catid, new: $event })">
 				<template #icon>
 					<div :class="{ favoriteMarker: true, navigationFavoriteMarkerDark: isDarkTheme, navigationFavoriteMarker: !isDarkTheme }"
@@ -118,6 +120,26 @@
 						@click="$emit('delete-shared-category-from-map', catid)">
 						{{ t('maps', 'Leave share') }}
 					</NcActionButton>
+				</template>
+				<template slot="default">
+					<NcAppNavigationItem
+						v-for="favorite in getFavoritesForCategory(catid)"
+						:key="favorite.id"
+						:name="favorite.name || t('maps', 'No name')"
+						:class="{ 'favorite-item': true, 'favorite-selected': selectedFavorite?.id === favorite.id }"
+						@click="onFavoriteClick(favorite)">
+						<template #icon>
+							<div class="favorite-icon" 
+								:style="'background-color: #' + c.color" />
+						</template>
+						<template #actions>
+							<NcActionButton 
+								icon="icon-external" 
+								@click.stop="openFavoriteInGoogleMaps(favorite)">
+								{{ t('maps', 'Navigate in Google Maps') }}
+							</NcActionButton>
+						</template>
+					</NcAppNavigationItem>
 				</template>
 			</NcAppNavigationItem>
 		</template>
@@ -179,6 +201,8 @@ export default {
 			open: optionsController.optionValues?.favoriteCategoryListShow === 'true',
 			isLinkCopied: {},
 			isDarkTheme: OCA.Accessibility?.theme === 'dark',
+			categoryOpen: {},
+			selectedFavorite: null,
 		}
 	},
 
@@ -204,6 +228,20 @@ export default {
 	},
 
 	methods: {
+		getFavoritesForCategory(catid) {
+			return Object.values(this.favorites).filter(f => f.category === catid)
+		},
+		onCategoryUpdateOpen(catid, isOpen) {
+			this.$set(this.categoryOpen, catid, isOpen)
+		},
+		onFavoriteClick(favorite) {
+			this.selectedFavorite = favorite
+			this.$emit('favorite-selected', favorite)
+		},
+		openFavoriteInGoogleMaps(favorite) {
+			const url = `https://www.google.com/maps/dir//${favorite.lat},${favorite.lng}`
+			window.open(url, '_blank')
+		},
 		onFavoritesClick() {
 			if (!this.enabled && !this.open) {
 				this.open = true
@@ -301,5 +339,21 @@ export default {
 	-webkit-mask: url('../../img/save.svg') no-repeat;
 	-webkit-mask-size: 16px auto;
 	-webkit-mask-position: center;
+}
+
+.favorite-item {
+	margin-left: 16px;
+}
+
+.favorite-icon {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin: 4px;
+}
+
+.favorite-selected {
+	background-color: var(--color-primary-element-light);
+	font-weight: bold;
 }
 </style>
