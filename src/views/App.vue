@@ -30,6 +30,7 @@
 					@toggle-all-categories="onToggleAllFavoriteCategories"
 					@export="onExportFavorites"
 					@import="onImportFavorites"
+					@favorite-selected="onFavoriteSelected"
 					@draggable-clicked="favoritesDraggable = !favoritesDraggable" />
 				<AppNavigationContactsItem
 					:enabled="contactsEnabled"
@@ -1610,6 +1611,12 @@ export default {
 			this.openSidebar(null, 'favorite', f.name)
 			window.OCA.Files.Sidebar.setActiveTab('favorite')
 			this.selectedFavorite = f
+		},
+		onFavoriteSelected(favorite) {
+			// Called from navigation sidebar when favorite is clicked
+			this.onFavoriteClick(favorite)
+			// Also center the map on the favorite
+			this.$refs.map.setView([favorite.lat, favorite.lng], 15)
 		},
 		onFavoriteEdit(f, save = true) {
 			network.editFavorite(f.id, f.name, f.category, f.comment, f.lat, f.lng, this.myMapId, getToken()).then((response) => {
