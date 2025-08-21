@@ -46,8 +46,7 @@ export const getThemingColorFromCategoryKey = categoryName => {
 }
 
 export const getGoogleMapsUrl = (lat, lng, name = null) => {
-	const baseUrl = 'https://www.google.com/maps/dir/'
 	const destination = `${lat},${lng}`
-	const query = name ? `/${encodeURIComponent(name)}/@${destination}` : `/${destination}`
-	return `${baseUrl}${query}`
+	// Use current location as starting point (empty first parameter)
+	return `https://www.google.com/maps/dir//${destination}`
 }
